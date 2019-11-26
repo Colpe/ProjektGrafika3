@@ -12,10 +12,14 @@ namespace ImagesConverter
 {
     public partial class Form1 : Form
     {
-        public int K { get; private set; }
-        public int Kr { get; private set; }
-        public int Kg { get; private set; }
-        public int Kb { get; private set; }
+        List<int> RList { get; set; }
+        List<int> GList { get; set; }
+        List<int> BList { get; set; }
+
+        public int K { get; private set; } = 2;
+        public int Kr { get; private set; } = 2;
+        public int Kg { get; private set; } = 2;
+        public int Kb { get; private set; } = 2;
         public int imgWidth { get; private set; }
         public int imgHeight { get; private set; }
         public AlgorithmsTypes SelectedAlg { get; private set; } = AlgorithmsTypes.DrawImage;
@@ -32,6 +36,9 @@ namespace ImagesConverter
             this.imgHeight = this.workspace.Height;
             this.imgWidth = this.workspace.Width;
 
+            this.RList = PreparePallette.DividePalette(this.Kr);
+            this.GList = PreparePallette.DividePalette(this.Kg);
+            this.BList = PreparePallette.DividePalette(this.Kb);
         }
 
         private void label3_Click(object sender, EventArgs e)
@@ -42,7 +49,7 @@ namespace ImagesConverter
         private void loadImageButton_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
-            dialog.Filter = "png, jpeg files (*.jpeg)|*.jpg|(*.png)|*png";
+            dialog.Filter = "png, jpeg files (*.png,*.jpeg)|*png;*.jpg";
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
@@ -64,23 +71,26 @@ namespace ImagesConverter
             {
                 case AlgorithmsTypes.DrawImage:
                     this.WorkspaceBitmap = this.ResizedBitmap;
-                    Workspace.Image = this.WorkspaceBitmap;
                     break;
                 case AlgorithmsTypes.AveDithering:
+                    this.WorkspaceBitmap = AverageDithering.averageDitheringAlgorithm(this.Bitmap);
                     break;
                 case AlgorithmsTypes.OrdDithering1:
+                    this.WorkspaceBitmap = OrderDitheringAlgorithm.OrderDithering(this.Bitmap,this.Kr,this.Kg,this.Kb);
                     break;
                 case AlgorithmsTypes.OrdDithering2:
                     break;
                 case AlgorithmsTypes.ErrorPropagation:
+                    this.WorkspaceBitmap = ErrorPropagationAlgorithm.ErrorPropagation(RList, GList, BList, Bitmap);
                     break;
                 case AlgorithmsTypes.PopularityAlg:
                     break;
                 default:
                     break;
             }
+            this.Workspace.Image = this.WorkspaceBitmap;
 
-   //       not needed  this.Workspace.Invalidate();
+            //       not needed  this.Workspace.Invalidate();
         }
 
         private void workspace_Paint(object sender, PaintEventArgs e)
@@ -122,21 +132,30 @@ namespace ImagesConverter
         private void KtrackBar_Scroll(object sender, EventArgs e)
         {
             this.K = KtrackBar.Value;
+            this.RList = PreparePallette.DividePalette(this.K);
+            this.GList = PreparePallette.DividePalette(this.K);
+            this.BList = PreparePallette.DividePalette(this.K);
         }
 
         private void KRtrackBar_Scroll(object sender, EventArgs e)
         {
             this.Kr = KRtrackBar.Value;
+            this.RList = PreparePallette.DividePalette(this.Kr);
+            this.KRlabel.Text = this.Kr.ToString();
         }
 
         private void KGtrackBar_Scroll(object sender, EventArgs e)
         {
             this.Kg = KGtrackBar.Value;
+            this.GList = PreparePallette.DividePalette(this.Kg);
+            this.KGlabel.Text = this.Kg.ToString();
         }
 
         private void KBtrackBar_Scroll(object sender, EventArgs e)
         {
             this.Kb = KBtrackBar.Value;
+            this.BList = PreparePallette.DividePalette(this.Kb);
+            this.KBlabel.Text = this.Kb.ToString();
         }
 
     }
