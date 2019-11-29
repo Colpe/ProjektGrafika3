@@ -16,145 +16,104 @@ namespace ImagesConverter
             int nG = SelectN(kg);
             int nB = SelectN(kb);
 
-            int[,] mR = GenerateArray(nR);
-            int[,] mG = GenerateArray(nG);
-            int[,] mB = GenerateArray(nB);
+            int[,] mR = GenerateMatrix2(nR);
+            int[,] mG = GenerateMatrix2(nG);
+            int[,] mB = GenerateMatrix2(nB);
 
+            Bitmap btm = new Bitmap(pixels.GetLength(0), pixels.GetLength(1));
             (byte, byte, byte)[,] colors = new (byte, byte, byte)[pixels.GetLength(0), pixels.GetLength(1)];
 
-            for (int x = 0; x < pixels.GetLength(0); x += nR)
+            for (int x = 0; x < pixels.GetLength(0); x += 1)
             {
-                for (int y = 0; y < pixels.GetLength(1); y += nR)
+                for (int y = 0; y < pixels.GetLength(1); y += 1)
                 {
-                    for (int i = 0; i < nR; i++)
+                    int r, g, b;
                     {
-                        for (int j = 0; j < nR; j++)
-                        {
-                            if (x + i < pixels.GetLength(0) && y + j < pixels.GetLength(1))
-                            {
-                                Color c = AproximateColor.Approximate(RColors, GColors, BColors, pixels[x + i, y + j]);
-
-                                if (c.R > mR[i, j])
-                                    colors[x + i, y + j].Item1 = 255;// (byte)(pixels[x + i, y + j].R + 1);
-                                else
-                                    colors[x + i, y + j].Item1 = 0;// pixels[x + i, y + j].R;
-                            }
-                        }
+                        int col = pixels[x, y].R;//AproximateColor.Approximate(RColors, GColors, BColors, pixels[x + i, y + j]);
+                        double re = ((double)(kr - 1) * nR * nR / 255) * pixels[x, y].R % (nR * nR);
+                        if (re <= mR[x % nR, y % nR])
+                            r = RColors.Last(k => k <= col);// (byte)(pixels[x + i, y + j].R + 1);
+                        else
+                            r = RColors.First(k => k >= col);// pixels[x + i, y + j].R;
                     }
-                }
-            }
-            for (int x = 0; x < pixels.GetLength(0); x += nG)
-            {
-                for (int y = 0; y < pixels.GetLength(1); y += nG)
-                {
-                    for (int i = 0; i < nG; i++)
                     {
-                        for (int j = 0; j < nG; j++)
-                        {
-                            if (x + i < pixels.GetLength(0) && y + j < pixels.GetLength(1))
-                            {
-                                Color c = AproximateColor.Approximate(RColors, GColors, BColors, pixels[x + i, y + j]);
-                                if (c.G > mG[i, j])
-                                    colors[x + i, y + j].Item2 = 255;// (byte)(pixels[x + i, y + j].G + 1);
-                                else
-                                    colors[x + i, y + j].Item2 = 0;// (byte)(pixels[x + i, y + j].G);
-                            }
-                        }
+                        int col = pixels[x, y].G;//AproximateColor.Approximate(RColors, GColors, BColors, pixels[x + i, y + j]);
+                        double re = ((double)(kg - 1) * nG * nG / 255) * pixels[x, y].G % (nG * nG);
+                        if (re <= mG[x % nG, y % nG])
+                            g = GColors.Last(k => k <= col);// (byte)(pixels[x + i, y + j].R + 1);
+                        else
+                            g = GColors.First(k => k >= col);// pixels[x + i, y + j].R;
                     }
-
-                }
-            }
-
-            for (int x = 0; x < pixels.GetLength(0); x += nB)
-            {
-                for (int y = 0; y < pixels.GetLength(1); y += nB)
-                {
-
-                    for (int i = 0; i < nB; i++)
                     {
-                        for (int j = 0; j < nB; j++)
-                        {
-                            if (x + i < pixels.GetLength(0) && y + j < pixels.GetLength(1))
-                            {
-                                Color c = AproximateColor.Approximate(RColors, GColors, BColors, pixels[x + i, y + j]);
-
-                                if (c.B > mB[i, j])
-                                    colors[x + i, y + j].Item3 = 255;// (byte)(pixels[x + i, y + j].B + 1);
-                                else
-                                    colors[x + i, y + j].Item3 = 0;// (byte)(pixels[x + i, y + j].B);
-                            }
-                        }
+                        int col = pixels[x, y].B;
+                        double re = ((double)(kb - 1) * nB * nB / 255) * pixels[x, y].B % (nB * nB);
+                        if (re <= mB[x % nB, y % nB])
+                            b = BColors.Last(k => k <= col);// (byte)(pixels[x + i, y + j].R + 1);
+                        else
+                            b = BColors.First(k => k >= col);// pixels[x + i, y + j].R;
                     }
+                    btm.SetPixel(x, y, Color.FromArgb(r, g, b));
                 }
             }
-            Bitmap btm = new Bitmap(pixels.GetLength(0), pixels.GetLength(1));
-            for (int i = 0; i < pixels.GetLength(0); i++)
-            {
-                for (int j = 0; j < pixels.GetLength(1); j++)
-                {
-                    btm.SetPixel(i, j, Color.FromArgb(colors[i, j].Item1, colors[i, j].Item2, colors[i, j].Item3));
-                }
-            }
-
-
 
             return btm;
         }
 
         private static int SelectN(int k)
         {
-            List<int> n = new List<int>() { 2, 3, 4, 8, 16 };
+            List<int> n = new List<int>() { 2, 3, 4, 6, 8, 12, 16 };
             int i = 0;
             while (n[i] * n[i] * (k - 1) < 255)
                 i++;
             return n[i];
+            //   return 8;
         }
 
-        private static int[,] GenerateArray(int n)
+
+        static int[,] GenerateMatrix2(int n)
         {
-            if (n == 9)
+            List<int[,]> D23 = new List<int[,]>();
+            int[,] D2 = new int[,]
             {
-                return new int[,]
-                {
-                    {1,7,4 },
-                    {5,8,3 },
-                    {6,2,9 }
-                };
-            }
+                { 0,2},
+                {3,1 }
+            };
 
-            int M = (int)Math.Log(n, 2);
-            int L = (int)Math.Log(n, 2);
-            Console.WriteLine(M + " " + L);
-
-            int xdim = 1 << M;
-            int ydim = 1 << L;
-            int[,] result = new int[n, n];
-            for (int y = 0; y < ydim; ++y)
+            int[,] D3 = new int[,]
             {
-                for (int x = 0; x < xdim; ++x)
-                {
-                    int v = 0, offset = 0, xmask = M, ymask = L;
-                    int xc = x, yc = y ^ ((x << L) >> M);
+                { 6,8,4},
+                {1,0,3 },
+                {5,2,7 }
+            };
+            D23.Add(D2);
+            D23.Add(D3);
 
-                    for (int bit = 0; bit < M + L;)
-                    {
-                        v |= ((xc >> --xmask) & 1) << bit++;
-                        for (offset += L; offset >= M; offset -= M)
-                            v |= ((yc >> --ymask) & 1) << bit++;
-                    }
-                    result[y, x] = 255 * v / (n * n);
-                }
-            }
+            if (n == 2)
+                return D2;
+            if (n == 3)
+                return D3;
 
-            for (int i = 0; i < n; i++)
-            {
-                for (int j = 0; j < n; j++)
-                {
-                    Console.Write(result[i, j] + "  ");
-                }
-                Console.WriteLine();
-            }
-            return result;
+            int[,] D2n = new int[n, n];
+            int[,] Dn = GenerateMatrix2(n / 2);
+
+            for (int i = 0; i < n / 2; i++)
+                for (int j = 0; j < n / 2; j++)
+                    D2n[i, j] = 4 * Dn[i, j];
+            for (int i = 0; i < n / 2; i++)
+                for (int j = n / 2; j < n; j++)
+                    D2n[i, j] = 4 * Dn[i, j % (n / 2)] + 2;
+
+            for (int i = n / 2; i < n; i++)
+                for (int j = 0; j < n / 2; j++)
+                    D2n[i, j] = 4 * Dn[i % (n / 2), j] + 3;
+
+            for (int i = n / 2; i < n; i++)
+                for (int j = n / 2; j < n; j++)
+                    D2n[i, j] = 4 * Dn[i % (n / 2), j % (n / 2)] + 1;
+
+
+            return D2n;
         }
+
     }
 }
