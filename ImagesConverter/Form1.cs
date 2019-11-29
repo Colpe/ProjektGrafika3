@@ -61,6 +61,7 @@ namespace ImagesConverter
                     for (int j = 0; j < this.imgHeight; j++)
                         this.Bitmap[i, j] = resized.GetPixel(i, j);
 
+                this.orignal.Image = resized;
                 this.ResizedBitmap = resized;
             }
         }
@@ -76,31 +77,31 @@ namespace ImagesConverter
                     this.WorkspaceBitmap = AverageDithering.averageDitheringAlgorithm(this.Bitmap, RList, GList, BList);
                     break;
                 case AlgorithmsTypes.OrdDithering1:
-                    this.WorkspaceBitmap = OrderDitheringAlgorithm.OrderDithering(this.Bitmap,this.Kr,this.Kg,this.Kb,RList,GList,BList);
+                    this.WorkspaceBitmap = OrderDitheringAlgorithm.OrderDithering(this.Bitmap, this.Kr, this.Kg, this.Kb, RList, GList, BList);
                     break;
                 case AlgorithmsTypes.OrdDithering2:
+                    this.WorkspaceBitmap = OrderDitheringAlgorithm.OrderDithering(this.Bitmap, this.Kr, this.Kg, this.Kb, RList, GList, BList, true);
                     break;
                 case AlgorithmsTypes.ErrorPropagation:
                     this.WorkspaceBitmap = ErrorPropagationAlgorithm.ErrorPropagation(RList, GList, BList, Bitmap);
                     break;
                 case AlgorithmsTypes.PopularityAlg:
+                    this.WorkspaceBitmap = PopularityAlgorithm.Popularity(this.Bitmap, this.K);
                     break;
                 default:
                     break;
             }
             this.Workspace.Image = this.WorkspaceBitmap;
-
-            //       not needed  this.Workspace.Invalidate();
+            this.Workspace.Invalidate();
         }
 
         private void workspace_Paint(object sender, PaintEventArgs e)
         {
+
             using (Graphics gp = this.Workspace.CreateGraphics())
             {
-                if (this.WorkspaceBitmap != null)
-                {
-                    gp.DrawImage(this.WorkspaceBitmap, new PointF(0, 0));
-                }
+                if (this.ResizedBitmap != null)
+                    gp.DrawImage(this.ResizedBitmap, new PointF(0, 0));
             }
         }
 
@@ -132,9 +133,7 @@ namespace ImagesConverter
         private void KtrackBar_Scroll(object sender, EventArgs e)
         {
             this.K = KtrackBar.Value;
-            this.RList = PreparePallette.DividePalette(this.K);
-            this.GList = PreparePallette.DividePalette(this.K);
-            this.BList = PreparePallette.DividePalette(this.K);
+            this.Klabel.Text = this.K.ToString();
         }
 
         private void KRtrackBar_Scroll(object sender, EventArgs e)
@@ -158,5 +157,20 @@ namespace ImagesConverter
             this.KBlabel.Text = this.Kb.ToString();
         }
 
+        private void DrawImageradioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            this.SelectedAlg = AlgorithmsTypes.DrawImage;
+        }
+
+        private void workspace_Paint_1(object sender, PaintEventArgs e)
+        {
+            using (Graphics gp = this.Workspace.CreateGraphics())
+            {
+                if (this.WorkspaceBitmap != null)
+                {
+                    gp.DrawImage(this.WorkspaceBitmap, new PointF(0, 0));
+                }
+            }
+        }
     }
 }

@@ -10,7 +10,7 @@ namespace ImagesConverter
     class OrderDitheringAlgorithm
     {
 
-        static public Bitmap OrderDithering(Color[,] pixels, int kr, int kg, int kb, List<int> RColors, List<int> GColors, List<int> BColors)
+        static public Bitmap OrderDithering(Color[,] pixels, int kr, int kg, int kb, List<int> RColors, List<int> GColors, List<int> BColors, bool isRandom= false)
         {
             int nR = SelectN(kr);
             int nG = SelectN(kg);
@@ -19,9 +19,8 @@ namespace ImagesConverter
             int[,] mR = GenerateMatrix2(nR);
             int[,] mG = GenerateMatrix2(nG);
             int[,] mB = GenerateMatrix2(nB);
-
+            Random rnd = new Random();
             Bitmap btm = new Bitmap(pixels.GetLength(0), pixels.GetLength(1));
-            (byte, byte, byte)[,] colors = new (byte, byte, byte)[pixels.GetLength(0), pixels.GetLength(1)];
 
             for (int x = 0; x < pixels.GetLength(0); x += 1)
             {
@@ -31,7 +30,7 @@ namespace ImagesConverter
                     {
                         int col = pixels[x, y].R;
                         double re = ((double)(kr - 1) * nR * nR / 255) * pixels[x, y].R % (nR * nR);
-                        if (re <= mR[x % nR, y % nR])
+                        if (re <= (isRandom ? rnd.Next() % nR*nR : mR[x % nR, y % nR]))
                             r = RColors.Last(k => k <= col);
                         else
                             r = RColors.First(k => k >= col);
@@ -39,7 +38,7 @@ namespace ImagesConverter
                     {
                         int col = pixels[x, y].G;
                         double re = ((double)(kg - 1) * nG * nG / 255) * pixels[x, y].G % (nG * nG);
-                        if (re <= mG[x % nG, y % nG])
+                        if (re <= (isRandom ? rnd.Next() % nG*nG : mG[x % nG, y % nG]))
                             g = GColors.Last(k => k <= col);
                         else
                             g = GColors.First(k => k >= col);
@@ -47,7 +46,7 @@ namespace ImagesConverter
                     {
                         int col = pixels[x, y].B;
                         double re = ((double)(kb - 1) * nB * nB / 255) * pixels[x, y].B % (nB * nB);
-                        if (re <= mB[x % nB, y % nB])
+                        if (re <= (isRandom ? rnd.Next() % nB*nB : mB[x % nB, y % nB]))
                             b = BColors.Last(k => k <= col);
                         else
                             b = BColors.First(k => k >= col);
