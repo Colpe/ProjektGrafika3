@@ -72,7 +72,6 @@ namespace ImagesConverter
 
         static int[,] GenerateMatrix2(int n)
         {
-            List<int[,]> D23 = new List<int[,]>();
             int[,] D2 = new int[,]
             {
                 { 0,2},
@@ -85,9 +84,6 @@ namespace ImagesConverter
                 {1,0,3 },
                 {5,2,7 }
             };
-            D23.Add(D2);
-            D23.Add(D3);
-
             if (n == 2)
                 return D2;
             if (n == 3)
