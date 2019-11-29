@@ -29,28 +29,28 @@ namespace ImagesConverter
                 {
                     int r, g, b;
                     {
-                        int col = pixels[x, y].R;//AproximateColor.Approximate(RColors, GColors, BColors, pixels[x + i, y + j]);
+                        int col = pixels[x, y].R;
                         double re = ((double)(kr - 1) * nR * nR / 255) * pixels[x, y].R % (nR * nR);
                         if (re <= mR[x % nR, y % nR])
-                            r = RColors.Last(k => k <= col);// (byte)(pixels[x + i, y + j].R + 1);
+                            r = RColors.Last(k => k <= col);
                         else
-                            r = RColors.First(k => k >= col);// pixels[x + i, y + j].R;
+                            r = RColors.First(k => k >= col);
                     }
                     {
-                        int col = pixels[x, y].G;//AproximateColor.Approximate(RColors, GColors, BColors, pixels[x + i, y + j]);
+                        int col = pixels[x, y].G;
                         double re = ((double)(kg - 1) * nG * nG / 255) * pixels[x, y].G % (nG * nG);
                         if (re <= mG[x % nG, y % nG])
-                            g = GColors.Last(k => k <= col);// (byte)(pixels[x + i, y + j].R + 1);
+                            g = GColors.Last(k => k <= col);
                         else
-                            g = GColors.First(k => k >= col);// pixels[x + i, y + j].R;
+                            g = GColors.First(k => k >= col);
                     }
                     {
                         int col = pixels[x, y].B;
                         double re = ((double)(kb - 1) * nB * nB / 255) * pixels[x, y].B % (nB * nB);
                         if (re <= mB[x % nB, y % nB])
-                            b = BColors.Last(k => k <= col);// (byte)(pixels[x + i, y + j].R + 1);
+                            b = BColors.Last(k => k <= col);
                         else
-                            b = BColors.First(k => k >= col);// pixels[x + i, y + j].R;
+                            b = BColors.First(k => k >= col);
                     }
                     btm.SetPixel(x, y, Color.FromArgb(r, g, b));
                 }
