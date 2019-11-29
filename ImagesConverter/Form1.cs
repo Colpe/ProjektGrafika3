@@ -73,10 +73,10 @@ namespace ImagesConverter
                     this.WorkspaceBitmap = this.ResizedBitmap;
                     break;
                 case AlgorithmsTypes.AveDithering:
-                    this.WorkspaceBitmap = AverageDithering.averageDitheringAlgorithm(this.Bitmap);
+                    this.WorkspaceBitmap = AverageDithering.averageDitheringAlgorithm(this.Bitmap, RList, GList, BList);
                     break;
                 case AlgorithmsTypes.OrdDithering1:
-                    this.WorkspaceBitmap = OrderDitheringAlgorithm.OrderDithering(this.Bitmap,this.Kr,this.Kg,this.Kb);
+                    this.WorkspaceBitmap = OrderDitheringAlgorithm.OrderDithering(this.Bitmap,this.Kr,this.Kg,this.Kb,RList,GList,BList);
                     break;
                 case AlgorithmsTypes.OrdDithering2:
                     break;

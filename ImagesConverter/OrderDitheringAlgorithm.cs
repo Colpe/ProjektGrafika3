@@ -10,7 +10,7 @@ namespace ImagesConverter
     class OrderDitheringAlgorithm
     {
 
-        static public Bitmap OrderDithering(Color[,] pixels, int kr, int kg, int kb)
+        static public Bitmap OrderDithering(Color[,] pixels, int kr, int kg, int kb, List<int> RColors, List<int> GColors, List<int> BColors)
         {
             int nR = SelectN(kr);
             int nG = SelectN(kg);
@@ -21,84 +21,7 @@ namespace ImagesConverter
             int[,] mB = GenerateArray(nB);
 
             (byte, byte, byte)[,] colors = new (byte, byte, byte)[pixels.GetLength(0), pixels.GetLength(1)];
-            for (int x = 0; x < pixels.GetLength(0); x++)
-            {
-                for (int y = 0; y < pixels.GetLength(1); y++)
-                {
-                    for (int i = 0; i < nR; i++)
-                    {
-                        for (int j = 0; j < nR; j++)
-                        {
-                            if (x + i < pixels.GetLength(0) && y + j < pixels.GetLength(1))
-                                if (pixels[x + i, y + j].R % (nR * nR) > mR[i, j])
-                                    colors[x + i, y + j].Item1 = (byte)(pixels[x + i, y + j].R + 1);
-                                else
-                                    colors[x + i, y + j].Item1 = pixels[x + i, y + j].R;
-                        }
-                    }
-                    for (int i = 0; i < nG; i++)
-                    {
-                        for (int j = 0; j < nG; j++)
-                        {
-                            if (x + i < pixels.GetLength(0) && y + j < pixels.GetLength(1))
-                                if (pixels[x + i, y + j].G % (nG * nG) > mG[i, j])
-                                    colors[x + i, y + j].Item2 = (byte)(pixels[x + i, y + j].G + 1);
-                                else
-                                    colors[x + i, y + j].Item2 = (byte)(pixels[x + i, y + j].G);
-                        }
-                    }
-                    for (int i = 0; i < nB; i++)
-                    {
-                        for (int j = 0; j < nB; j++)
-                        {
-                            if (x + i < pixels.GetLength(0) && y + j < pixels.GetLength(1))
-                                if (pixels[x + i, y + j].B % (nB * nB) > mB[i, j])
-                                    colors[x + i, y + j].Item3 = (byte)(pixels[x + i, y + j].B + 1);
-                                else
-                                    colors[x + i, y + j].Item3 = (byte)(pixels[x + i, y + j].B);
-                        }
-                    }
-                }
-            }
-            for (int x = 0; x < pixels.GetLength(0); x++)
-            {
-                for (int y = 0; y < pixels.GetLength(1); y++)
-                {
-                    for (int i = 0; i < nR; i++)
-                    {
-                        for (int j = 0; j < nR; j++)
-                        {
-                            if (x + i < pixels.GetLength(0) && y + j < pixels.GetLength(1))
-                                if (pixels[x + i, y + j].R % (nR * nR) > mR[i, j])
-                                    colors[x + i, y + j].Item1 = (byte)(pixels[x + i, y + j].R + 1);
-                                else
-                                    colors[x + i, y + j].Item1 = pixels[x + i, y + j].R;
-                        }
-                    }
-                    for (int i = 0; i < nG; i++)
-                    {
-                        for (int j = 0; j < nG; j++)
-                        {
-                            if (x + i < pixels.GetLength(0) && y + j < pixels.GetLength(1))
-                                if (pixels[x + i, y + j].G % (nG * nG) > mG[i, j])
-                                    colors[x + i, y + j].Item2 = (byte)(pixels[x + i, y + j].G + 1);
-                                else
-                                    colors[x + i, y + j].Item2 = (byte)(pixels[x + i, y + j].G);
-                        }
-                    }
-                    for (int i = 0; i < nB; i++)
-                    {
-                        for (int j = 0; j < nB; j++)
-                        {
-                            if (x + i < pixels.GetLength(0) && y + j < pixels.GetLength(1))
-                                if (pixels[x + i, y + j].B % (nB * nB) > mB[i, j])
-                                    colors[x + i, y + j].Item3 = (byte)(pixels[x + i, y + j].B + 1);
-                                else
-                                    colors[x + i, y + j].Item3 = (byte)(pixels[x + i, y + j].B);
-                        }
-                    }
-                }
-            }
+
             for (int x = 0; x < pixels.GetLength(0); x += nR)
             {
                 for (int y = 0; y < pixels.GetLength(1); y += nR)
@@ -108,10 +31,14 @@ namespace ImagesConverter
                         for (int j = 0; j < nR; j++)
                         {
                             if (x + i < pixels.GetLength(0) && y + j < pixels.GetLength(1))
-                                if (pixels[x + i, y + j].R > mR[i, j])
+                            {
+                                Color c = AproximateColor.Approximate(RColors, GColors, BColors, pixels[x + i, y + j]);
+
+                                if (c.R > mR[i, j])
                                     colors[x + i, y + j].Item1 = 255;// (byte)(pixels[x + i, y + j].R + 1);
                                 else
                                     colors[x + i, y + j].Item1 = 0;// pixels[x + i, y + j].R;
+                            }
                         }
                     }
                 }
@@ -126,8 +53,8 @@ namespace ImagesConverter
                         {
                             if (x + i < pixels.GetLength(0) && y + j < pixels.GetLength(1))
                             {
-                                Color c=Appro
-                                if (pixels[x + i, y + j].G > mG[i, j])
+                                Color c = AproximateColor.Approximate(RColors, GColors, BColors, pixels[x + i, y + j]);
+                                if (c.G > mG[i, j])
                                     colors[x + i, y + j].Item2 = 255;// (byte)(pixels[x + i, y + j].G + 1);
                                 else
                                     colors[x + i, y + j].Item2 = 0;// (byte)(pixels[x + i, y + j].G);
@@ -148,10 +75,14 @@ namespace ImagesConverter
                         for (int j = 0; j < nB; j++)
                         {
                             if (x + i < pixels.GetLength(0) && y + j < pixels.GetLength(1))
-                                if (pixels[x + i, y + j].B > mB[i, j])
+                            {
+                                Color c = AproximateColor.Approximate(RColors, GColors, BColors, pixels[x + i, y + j]);
+
+                                if (c.B > mB[i, j])
                                     colors[x + i, y + j].Item3 = 255;// (byte)(pixels[x + i, y + j].B + 1);
                                 else
                                     colors[x + i, y + j].Item3 = 0;// (byte)(pixels[x + i, y + j].B);
+                            }
                         }
                     }
                 }

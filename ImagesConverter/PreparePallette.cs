@@ -10,7 +10,7 @@ namespace ImagesConverter
     {
         public static List<int> DividePalette(int k)
         {
-            float p = 255 / (k-1);
+            float p = (float)255 / (k-1);
             List<int> rsl = new List<int>();
             for (int i = 0; i < k; i++)
                 rsl.Add((int)(i*p));
