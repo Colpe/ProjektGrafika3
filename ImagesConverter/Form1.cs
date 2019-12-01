@@ -172,5 +172,10 @@ namespace ImagesConverter
                 }
             }
         }
+
+        private void workspace_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
